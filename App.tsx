@@ -48,17 +48,20 @@ const App: React.FC = () => {
     const start = `${month}-01`;
     const end = `${month}-31`;
 
-    const { data: exps } = await supabase
+    const { data: exps, error: expError } = await supabase
       .from('expenses')
       .select('*')
       .gte('date', start)
       .lte('date', end)
       .order('date', { ascending: false });
     
-    const { data: deps } = await supabase
+    const { data: deps, error: depError } = await supabase
       .from('deposits')
       .select('*')
       .eq('month', month);
+
+    if (expError) console.error("Expense Fetch Error:", expError);
+    if (depError) console.error("Deposit Fetch Error:", depError);
 
     // Map database snake_case fields back to camelCase for the UI
     setExpenses(exps?.map(e => ({
@@ -132,7 +135,6 @@ const App: React.FC = () => {
     }]);
     
     if (error) {
-      console.error(error);
       alert('খরচ যোগ করতে সমস্যা হয়েছে: ' + error.message);
     } else {
       fetchMonthData(currentMonth);
@@ -147,7 +149,6 @@ const App: React.FC = () => {
     }]);
 
     if (error) {
-      console.error(error);
       alert('জমা যোগ করতে সমস্যা হয়েছে: ' + error.message);
     } else {
       fetchMonthData(currentMonth);
@@ -251,7 +252,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="mt-12 text-center text-slate-400 text-xs py-8">
-        <p>© {new Date().getFullYear()} ROOM NO 3 | Cloud Sync Enabled (Supabase)</p>
+        <p>© {new Date().getFullYear()} ROOM NO 3 | Cloud Sync Enabled</p>
       </footer>
     </div>
   );
